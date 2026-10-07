@@ -41,8 +41,15 @@
                     <td>${{ task.cost }}</td>
                     <td>
                         <!-- BUG 3: Ruta errónea /task/remove/ en lugar de /task/delete/ -->
-                        <form action="/task/remove/{{ task.id }}" method="POST" style="display:inline;">
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+=======
+                        <form action="/task/delete/{{ task.id }}" method="POST" style="display:inline;">
+>>>>>>> Stashed changes
                             <button type="submit" class="btn-delete">Eliminar</button>
+=======
+                         <form action="/task/delete/{{ task.id }}" method="POST" style="display:inline;">                            <button type="submit" class="btn-delete">Eliminar</button>
+>>>>>>> main
                         </form>
                     </td>
                 </tr>
