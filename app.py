@@ -1,6 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
+import math
+import os
+
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
+# Necesaria para mostrar los mensajes de validación con flash()
+app.secret_key = os.environ.get("SECRET_KEY", "clave-solo-para-desarrollo")
 
 # Base de datos en memoria para pruebas de clase
 tasks = [
@@ -14,12 +19,29 @@ def index():
     total_budget = sum([t["cost"] for t in tasks]) if tasks else 0
     return render_template('index.html', tasks=tasks, total_budget=total_budget)
 
+def validate_task(title, cost_raw):
+    """Devuelve un mensaje de error si los datos no son válidos; None si lo son."""
+    if not title:
+        return "El nombre de la tarea es obligatorio."
+    try:
+        cost = float(cost_raw)
+    except ValueError:
+        return "El costo es obligatorio y debe ser un valor numérico."
+    if not math.isfinite(cost) or cost < 0:
+        return "El costo debe ser un número mayor o igual a 0."
+    return None
+
 @app.route('/task/add', methods=['POST'])
 def add_task():
-    title = request.form.get('title')
-    cost_raw = request.form.get('cost')
+    title = (request.form.get('title') or '').strip()
+    cost_raw = (request.form.get('cost') or '').strip()
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
+    # Si algún dato es inválido se rechaza la solicitud y no se registra nada
+    error = validate_task(title, cost_raw)
+    if error:
+        flash(error)
+        return redirect(url_for('index'))
+
     new_id = len(tasks) + 1
     tasks.append({
         "id": new_id,
