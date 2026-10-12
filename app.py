@@ -14,18 +14,40 @@ def index():
     total_budget = sum([t["cost"] for t in tasks]) if tasks else 0
     return render_template('index.html', tasks=tasks, total_budget=total_budget)
 
+
 @app.route('/task/add', methods=['POST'])
 def add_task():
-    title = request.form.get('title')
-    cost_raw = request.form.get('cost')
+    title = request.form.get('title', '').strip()
+    cost_raw = request.form.get('cost', '').strip()
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
-    new_id = len(tasks) + 1
+    # Validar que el título no esté vacío
+    if not title:
+        return redirect(url_for('index'))
+
+    # Validar que el costo no esté vacío
+    if not cost_raw:
+        return redirect(url_for('index'))
+
+    # Validar que el costo sea numérico
+    try:
+        cost = float(cost_raw)
+    except ValueError:
+        return redirect(url_for('index'))
+
+    # Evitar costos negativos o valores no finitos
+    import math
+    if not math.isfinite(cost) or cost < 0:
+        return redirect(url_for('index'))
+
+    # Crear y guardar la tarea con datos válidos
+    new_id = max((t['id'] for t in tasks), default=0) + 1
+
     tasks.append({
         "id": new_id,
         "title": title,
-        "cost": cost_raw
+        "cost": cost
     })
+
     return redirect(url_for('index'))
 
 @app.route('/task/delete/<int:task_id>', methods=['POST'])
