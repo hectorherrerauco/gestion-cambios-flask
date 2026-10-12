@@ -19,12 +19,17 @@ def add_task():
     title = request.form.get('title')
     cost_raw = request.form.get('cost')
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
+    # RFC-002: convertir el costo a número antes de guardarlo
+    try:
+        cost = float(cost_raw) if cost_raw else 0.0
+    except ValueError:
+        cost = 0.0
+
     new_id = len(tasks) + 1
     tasks.append({
         "id": new_id,
         "title": title,
-        "cost": cost_raw
+        "cost": cost
     })
     return redirect(url_for('index'))
 
