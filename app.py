@@ -16,17 +16,32 @@ def index():
 
 @app.route('/task/add', methods=['POST'])
 def add_task():
-    title = request.form.get('title')
-    cost_raw = request.form.get('cost')
+    title = request.form.get('title', '').strip()
+    cost_input = request.form.get('cost', '').strip()
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
-    new_id = len(tasks) + 1
-    tasks.append({
-        "id": new_id,
-        "title": title,
-        "cost": cost_raw
-    })
-    return redirect(url_for('index'))
+    # Validar que el título no esté vacío
+    if not title:
+        return "Error: el título es obligatorio", 400
+
+    # Validar que el costo sea numérico y no negativo
+    try:
+        cost = float(cost_input)
+    except (ValueError, TypeError):
+        return "Error: el costo debe ser numérico", 400
+
+    if cost < 0:
+        return "Error: el costo no puede ser negativo", 400
+
+    # Agregar la tarea únicamente si los datos son válidos
+    task = {
+        'id': len(tasks) + 1,
+        'title': title,
+        'cost': cost
+    }
+
+    tasks.append(task)
+
+    return redirect('/')
 
 @app.route('/task/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
