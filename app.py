@@ -16,18 +16,18 @@ def index():
 
 @app.route('/task/add', methods=['POST'])
 def add_task():
-    title = request.form.get('title')
-    cost_raw = request.form.get('cost')
+    title = request.form.get('title', '').strip()
+    cost = float(request.form.get('cost', 0))
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
-    new_id = len(tasks) + 1
-    tasks.append({
-        "id": new_id,
-        "title": title,
-        "cost": cost_raw
-    })
-    return redirect(url_for('index'))
+    task = {
+        'id': len(tasks) + 1,
+        'title': title,
+        'cost': cost
+    }
 
+    tasks.append(task)
+
+    return redirect('/')
 @app.route('/task/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
     global tasks
@@ -36,3 +36,4 @@ def delete_task(task_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
