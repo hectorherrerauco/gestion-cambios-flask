@@ -18,9 +18,13 @@
         <h2>Gestor de Tareas y Presupuesto</h2>
         <p><strong>Presupuesto Total Estimado:</strong> ${{ total_budget }}</p>
 
+        {% if error %}
+        <p role="alert" style="color: #c0392b;">{{ error }}</p>
+        {% endif %}
+
         <form action="/task/add" method="POST">
             <input type="text" name="title" placeholder="Nombre de la tarea" required>
-            <input type="text" name="cost" placeholder="Costo USD" style="width: 110px;">
+            <input type="number" name="cost" placeholder="Costo USD" min="0" step="0.01" required style="width: 110px;">
             <button type="submit" class="btn-add">Agregar</button>
         </form>
 
