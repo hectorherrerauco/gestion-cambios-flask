@@ -10,7 +10,6 @@ tasks = [
 
 @app.route('/')
 def index():
-    # BUG 1: Si cost entra como string, causa TypeError al sumar int con str o concatena
     total_budget = sum([t["cost"] for t in tasks]) if tasks else 0
     return render_template('index.html', tasks=tasks, total_budget=total_budget)
 
@@ -19,12 +18,14 @@ def add_task():
     title = request.form.get('title')
     cost_raw = request.form.get('cost')
 
-    # BUG 2: Permite títulos vacíos y almacena cost como string sin convertir a entero
+    # RFC-002: convertir el costo a numerico antes de almacenarlo
+    cost = float(cost_raw)
+
     new_id = len(tasks) + 1
     tasks.append({
         "id": new_id,
         "title": title,
-        "cost": cost_raw
+        "cost": cost  # RFC-002: se guarda como numero, ya no como texto
     })
     return redirect(url_for('index'))
 
