@@ -24,7 +24,7 @@ def add_task():
     tasks.append({
         "id": new_id,
         "title": title,
-        "cost": cost_raw
+        "cost": float(cost_raw)
     })
     return redirect(url_for('index'))
 
